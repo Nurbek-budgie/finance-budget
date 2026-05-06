@@ -1,4 +1,5 @@
 import uuid
+from datetime import date, datetime
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
@@ -15,16 +16,19 @@ def _to_domain(orm: TransactionORM) -> Transaction:
         description=orm.description,
         amount=orm.amount,
         transaction_type=orm.transaction_type,
+        category=orm.category,
     )
 
 
-def _to_orm(transaction: Transaction) -> TransactionORM:
+def _to_orm(transaction: Transaction, external_id: Optional[str] = None) -> TransactionORM:
     return TransactionORM(
         id=transaction.id or str(uuid.uuid4()),
         date=transaction.date,
         description=transaction.description,
         amount=transaction.amount,
         transaction_type=transaction.transaction_type,
+        category=transaction.category,
+        external_id=external_id or getattr(transaction, "_external_id", None),
     )
 
 
@@ -55,9 +59,36 @@ class TransactionRepositoryImpl(TransactionRepository):
         )
         return [_to_domain(r) for r in rows]
 
+    def get_by_date_range(
+        self, start: date, end: date, limit: int = 100_000
+    ) -> List[Transaction]:
+        start_dt = datetime.combine(start, datetime.min.time())
+        end_dt = datetime.combine(end, datetime.max.time())
+        rows = (
+            self.db.query(TransactionORM)
+            .filter(TransactionORM.date >= start_dt, TransactionORM.date <= end_dt)
+            .order_by(TransactionORM.date.desc())
+            .limit(limit)
+            .all()
+        )
+        return [_to_domain(r) for r in rows]
+
     def get_by_id(self, transaction_id: str) -> Optional[Transaction]:
         row = self.db.query(TransactionORM).filter(TransactionORM.id == transaction_id).first()
         return _to_domain(row) if row else None
+
+    def create_many_with_external_ids(self, transactions: List[Transaction]) -> List[Transaction]:
+        orm_objects = [_to_orm(t) for t in transactions]
+        self.db.add_all(orm_objects)
+        self.db.commit()
+        return [_to_domain(o) for o in orm_objects]
+
+    def exists_by_external_id(self, external_id: str) -> bool:
+        return (
+            self.db.query(TransactionORM.id)
+            .filter(TransactionORM.external_id == external_id)
+            .first()
+        ) is not None
 
     def delete(self, transaction_id: str) -> bool:
         row = self.db.query(TransactionORM).filter(TransactionORM.id == transaction_id).first()

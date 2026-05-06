@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends
+from datetime import date
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.domain.services.transaction_service import TransactionService
@@ -13,10 +16,32 @@ def get_service(db: Session = Depends(get_db)) -> TransactionService:
 
 
 @router.get("/summary")
-def get_summary(service: TransactionService = Depends(get_service)):
-    return service.get_summary()
+def get_summary(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    service: TransactionService = Depends(get_service),
+):
+    return service.get_summary(start=start_date, end=end_date)
 
 
 @router.get("/balance")
 def get_balance(service: TransactionService = Depends(get_service)):
     return {"balance": service.get_balance()}
+
+
+@router.get("/daily-trend")
+def get_daily_trend(
+    start_date: date = Query(...),
+    end_date: date = Query(...),
+    service: TransactionService = Depends(get_service),
+):
+    return service.get_daily_trend(start=start_date, end=end_date)
+
+
+@router.get("/categories")
+def get_categories(
+    start_date: Optional[date] = Query(None),
+    end_date: Optional[date] = Query(None),
+    service: TransactionService = Depends(get_service),
+):
+    return service.get_category_breakdown(start=start_date, end=end_date)

@@ -16,12 +16,14 @@ class Transaction:
         amount: float,
         transaction_type: TransactionType,
         id: Optional[str] = None,
+        category: Optional[str] = None,
     ):
         self.id = id
         self.date = date
         self.description = description
         self.amount = amount
         self.transaction_type = transaction_type
+        self.category = category
 
     def is_income(self) -> bool:
         return self.transaction_type == TransactionType.INCOME

@@ -1,8 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, Enum as SQLEnum, Float, String
+from sqlalchemy import Boolean, Column, DateTime, Enum as SQLEnum, Float, Integer, String
 from sqlalchemy.orm import DeclarativeBase
 
+from app.domain.models.staged_transaction import StagedStatus
 from app.domain.models.transaction import TransactionType
 
 
@@ -18,4 +19,37 @@ class TransactionORM(Base):
     description = Column(String, nullable=False)
     amount = Column(Float, nullable=False)
     transaction_type = Column(SQLEnum(TransactionType), nullable=False)
+    category = Column(String, nullable=True)
+    external_id = Column(String, nullable=True, unique=True, index=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class TagRuleORM(Base):
+    __tablename__ = "tag_rules"
+
+    id = Column(String, primary_key=True, index=True)
+    keyword = Column(String, nullable=False)
+    category = Column(String, nullable=False)
+    priority = Column(Integer, nullable=False, default=5)
+    is_active = Column(Boolean, nullable=False, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class StagedTransactionORM(Base):
+    __tablename__ = "staged_transactions"
+
+    id = Column(String, primary_key=True, index=True)
+    date = Column(DateTime, nullable=False, index=True)
+    description = Column(String, nullable=False)
+    amount = Column(Float, nullable=False)
+    transaction_type = Column(SQLEnum(TransactionType), nullable=False)
+    external_id = Column(String, nullable=True, index=True)
+    source_file = Column(String, nullable=True)
+    suggested_category = Column(String, nullable=True)
+    confidence_score = Column(Float, nullable=False, default=0.0)
+    status = Column(
+        SQLEnum(StagedStatus, values_callable=lambda obj: [e.value for e in obj]),
+        nullable=False,
+        default=StagedStatus.PENDING,
+    )
+    staged_at = Column(DateTime, default=datetime.utcnow)
