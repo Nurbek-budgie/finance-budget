@@ -1,0 +1,99 @@
+.zone {
+  border: 2px dashed var(--line-2);
+  border-radius: var(--radius);
+  padding: 56px 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.zone:hover, .over {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.uploading {
+  cursor: default;
+  border-color: var(--primary-tint);
+  background: var(--primary-soft);
+}
+
+.hidden { display: none; }
+
+.ico {
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--surface);
+  margin-bottom: 4px;
+}
+
+.over .ico, .uploading .ico {
+  background: var(--primary-tint);
+  color: var(--primary-2);
+}
+
+.spinner {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border: 2.5px solid var(--primary-tint);
+  border-top-color: var(--primary-2);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.primary {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.secondary {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.formats {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.formats span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--ink-3);
+}
+
+.chooseBtn {
+  margin-top: 8px;
+  padding: 9px 24px;
+  border-radius: 8px;
+  border: none;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+
+.chooseBtn:hover { background: var(--ink-2); }

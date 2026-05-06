@@ -1,0 +1,118 @@
+.pageHead {
+  margin-bottom: 24px;
+}
+
+.title {
+  font-family: var(--serif);
+  font-size: 40px;
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.title em {
+  font-style: italic;
+  color: var(--primary);
+}
+
+.sub {
+  color: var(--ink-3);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.errorBanner {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--neg-soft);
+  color: var(--neg);
+  border: 1px solid oklch(0.85 0.06 28);
+  font-size: 13px;
+}
+
+.historySection {
+  margin-top: 32px;
+}
+
+.historyHead {
+  margin-bottom: 14px;
+}
+
+.sectionTitle {
+  font-family: var(--serif);
+  font-size: 22px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.historyList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.historyRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--bg);
+  transition: background 0.12s;
+}
+
+.historyRow:hover { background: var(--surface); }
+
+.fileIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+  flex: 0 0 auto;
+}
+
+.fileInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fileName {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.fileMeta {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.fileErrors {
+  font-size: 12px;
+  color: var(--neg);
+}
+
+.parsedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--pos-soft);
+  color: oklch(0.48 0.12 155);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
