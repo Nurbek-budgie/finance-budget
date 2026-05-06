@@ -1,0 +1,68 @@
+import uuid
+from typing import List, Optional
+
+from sqlalchemy.orm import Session
+
+from app.domain.models.transaction import Transaction
+from app.domain.repositories.transaction_repository import TransactionRepository
+from app.infrastructure.database.models import TransactionORM
+
+
+def _to_domain(orm: TransactionORM) -> Transaction:
+    return Transaction(
+        id=orm.id,
+        date=orm.date,
+        description=orm.description,
+        amount=orm.amount,
+        transaction_type=orm.transaction_type,
+    )
+
+
+def _to_orm(transaction: Transaction) -> TransactionORM:
+    return TransactionORM(
+        id=transaction.id or str(uuid.uuid4()),
+        date=transaction.date,
+        description=transaction.description,
+        amount=transaction.amount,
+        transaction_type=transaction.transaction_type,
+    )
+
+
+class TransactionRepositoryImpl(TransactionRepository):
+    def __init__(self, db: Session):
+        self.db = db
+
+    def create(self, transaction: Transaction) -> Transaction:
+        orm = _to_orm(transaction)
+        self.db.add(orm)
+        self.db.commit()
+        self.db.refresh(orm)
+        return _to_domain(orm)
+
+    def create_many(self, transactions: List[Transaction]) -> List[Transaction]:
+        orm_objects = [_to_orm(t) for t in transactions]
+        self.db.add_all(orm_objects)
+        self.db.commit()
+        return [_to_domain(o) for o in orm_objects]
+
+    def get_all(self, limit: int = 100, offset: int = 0) -> List[Transaction]:
+        rows = (
+            self.db.query(TransactionORM)
+            .order_by(TransactionORM.date.desc())
+            .limit(limit)
+            .offset(offset)
+            .all()
+        )
+        return [_to_domain(r) for r in rows]
+
+    def get_by_id(self, transaction_id: str) -> Optional[Transaction]:
+        row = self.db.query(TransactionORM).filter(TransactionORM.id == transaction_id).first()
+        return _to_domain(row) if row else None
+
+    def delete(self, transaction_id: str) -> bool:
+        row = self.db.query(TransactionORM).filter(TransactionORM.id == transaction_id).first()
+        if not row:
+            return False
+        self.db.delete(row)
+        self.db.commit()
+        return True

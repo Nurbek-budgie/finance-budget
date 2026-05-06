@@ -1,0 +1,32 @@
+[project]
+name = "finance-tracker"
+version = "0.1.0"
+description = "Personal finance tracker with FastAPI"
+authors = [
+    {name = "nurbek kubatbek"}
+]
+readme = "README.md"
+requires-python = "^3.10"
+dependencies = [
+    "fastapi (==0.104.1)",
+    "uvicorn[standard] (==0.24.0)",
+    "sqlalchemy (==2.0.23)",
+    "psycopg2-binary (==2.9.9)",
+    "pydantic (==2.5.0)",
+    "pydantic-settings (==2.1.0)",
+    "python-multipart (==0.0.6)",
+    "python-dotenv (==1.0.0)",
+    "alembic (==1.12.1)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (==7.4.3)",
+    "pytest-asyncio (==0.21.1)",
+    "httpx (==0.25.0)"
+]
