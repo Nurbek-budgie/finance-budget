@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTransactions, useDeleteTransaction } from '../hooks/useTransactions';
-import { useAnalyticsSummary } from '../hooks/useAnalytics';
 import TransactionTable from '../components/transactions/TransactionTable/TransactionTable';
 import styles from './TransactionsPage.module.css';
 
@@ -34,31 +33,40 @@ function periodDates(period: Period): { start: string; end: string } {
 
 export default function TransactionsPage() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [period, setPeriod] = useState<Period>('Month');
   const [page, setPage] = useState(0);
 
+  const search = searchParams.get('q') ?? '';
   const { start, end } = periodDates(period);
 
-  const { data: transactions = [], isLoading } = useTransactions({
+  const { data, isLoading } = useTransactions({
     start_date: start,
     end_date: end,
     limit: PAGE_SIZE,
     offset: page * PAGE_SIZE,
+    search: search || undefined,
   });
 
-  const { data: summary } = useAnalyticsSummary(start, end);
+  const transactions = data?.items ?? [];
+  const total = data?.total ?? 0;
+  const hasMore = (page + 1) * PAGE_SIZE < total;
+
   const deleteMutation = useDeleteTransaction();
 
   const now = new Date();
   const monthLabel = now.toLocaleString('en-US', { month: 'long', year: 'numeric' });
 
-  function handleDelete(id: string) {
-    deleteMutation.mutate(id);
-  }
+  // Reset to page 0 when search changes
+  useEffect(() => { setPage(0); }, [search]);
 
   function handlePeriodChange(p: Period) {
     setPeriod(p);
     setPage(0);
+  }
+
+  function handleSearch(value: string) {
+    setSearchParams(value ? { q: value } : {}, { replace: true });
   }
 
   return (
@@ -67,7 +75,8 @@ export default function TransactionsPage() {
         <div>
           <h1 className={styles.title}>Transactions<em>.</em></h1>
           <p className={styles.sub}>
-            {summary?.transaction_count ?? '…'} transactions · {period.toLowerCase()} view
+            {isLoading ? '…' : total} transactions · {period.toLowerCase()} view
+            {search && ` · "${search}"`}
           </p>
         </div>
 
@@ -103,10 +112,10 @@ export default function TransactionsPage() {
       <TransactionTable
         transactions={transactions}
         isLoading={isLoading}
-        onDelete={handleDelete}
+        onDelete={(id) => deleteMutation.mutate(id)}
       />
 
-      {!isLoading && (
+      {!isLoading && total > 0 && (
         <div className={styles.pagination}>
           <button
             className={styles.pageBtn}
@@ -115,11 +124,13 @@ export default function TransactionsPage() {
           >
             ← Prev
           </button>
-          <span className={styles.pageInfo}>Page {page + 1}</span>
+          <span className={styles.pageInfo}>
+            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, total)} of {total}
+          </span>
           <button
             className={styles.pageBtn}
             onClick={() => setPage(p => p + 1)}
-            disabled={transactions.length < PAGE_SIZE}
+            disabled={!hasMore}
           >
             Next →
           </button>

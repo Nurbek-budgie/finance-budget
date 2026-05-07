@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { useAnalyticsSummary } from '../../../hooks/useAnalytics';
 import styles from './Sidebar.module.css';
 
@@ -11,6 +11,7 @@ function Ico({ children }: { children: React.ReactNode }) {
 }
 
 export default function Sidebar() {
+  const navigate = useNavigate();
   const { data: summary } = useAnalyticsSummary();
   const txCount = summary?.transaction_count ?? null;
 
@@ -61,7 +62,7 @@ export default function Sidebar() {
         </NavLink>
       </nav>
 
-      <div className={styles.uploadBox}>
+      <div className={styles.uploadBox} onClick={() => navigate('/upload')} style={{ cursor: 'pointer' }}>
         <div className={styles.uploadIco}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="18" height="18">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>

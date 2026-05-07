@@ -13,8 +13,8 @@ export default function DropZone({ onFile, isUploading }: Props) {
   function handleFiles(files: FileList | null) {
     if (!files?.length) return;
     const file = files[0];
-    if (!file.name.match(/\.(csv|CSV)$/)) {
-      alert('Only CSV files are supported.');
+    if (!file.name.match(/\.(csv|CSV|xlsx|XLSX|xls|XLS)$/)) {
+      alert('Only CSV or Excel (.xlsx) files are supported.');
       return;
     }
     onFile(file);
@@ -31,7 +31,7 @@ export default function DropZone({ onFile, isUploading }: Props) {
       <input
         ref={inputRef}
         type="file"
-        accept=".csv"
+        accept=".csv,.xlsx,.xls"
         className={styles.hidden}
         onChange={(e) => handleFiles(e.target.files)}
       />
@@ -58,6 +58,7 @@ export default function DropZone({ onFile, isUploading }: Props) {
         <>
           <div className={styles.formats}>
             <span>CSV</span>
+            <span>Excel</span>
           </div>
           <button
             className={styles.chooseBtn}

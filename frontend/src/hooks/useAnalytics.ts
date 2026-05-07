@@ -25,11 +25,19 @@ export function useDailyTrend(startDate: string, endDate: string) {
   });
 }
 
-export function useCategoryBreakdown(startDate?: string, endDate?: string) {
+export function useCategoryBreakdown(startDate?: string, endDate?: string, type?: string) {
   return useQuery({
-    queryKey: ['analytics', 'categories', startDate, endDate],
+    queryKey: ['analytics', 'categories', startDate, endDate, type],
     queryFn: () => analyticsAPI.getCategories(
-      startDate && endDate ? { start_date: startDate, end_date: endDate } : {}
+      startDate && endDate ? { start_date: startDate, end_date: endDate, type } : { type }
     ),
+  });
+}
+
+export function useAllExpenseCategories() {
+  return useQuery({
+    queryKey: ['analytics', 'categories', 'all-expense'],
+    queryFn: () => analyticsAPI.getCategories({ type: 'expense' }),
+    staleTime: 5 * 60 * 1000,
   });
 }

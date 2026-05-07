@@ -1,0 +1,71 @@
+.container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  min-width: 260px;
+  max-width: 380px;
+  box-shadow: var(--shadow-lg);
+  pointer-events: all;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(16px); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+
+.success {
+  background: oklch(0.25 0.02 155);
+  border: 1px solid oklch(0.35 0.05 155);
+  color: oklch(0.92 0.04 155);
+}
+
+.error {
+  background: oklch(0.22 0.04 28);
+  border: 1px solid oklch(0.35 0.08 28);
+  color: oklch(0.92 0.04 28);
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.message {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.6;
+  color: inherit;
+  border-radius: 4px;
+  flex: 0 0 auto;
+  transition: opacity 0.12s;
+}
+
+.close:hover { opacity: 1; }

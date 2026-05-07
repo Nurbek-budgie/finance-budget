@@ -1,13 +1,13 @@
 import axios from 'axios';
-import type { Transaction, AnalyticsSummary, DailyTrend, CategoryBreakdown, UploadResult, StagedTransaction, TagRule } from '../types';
+import type { Transaction, PaginatedTransactions, AnalyticsSummary, DailyTrend, CategoryBreakdown, UploadResult, StagedTransaction, TagRule, Budget } from '../types';
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:8000/api/v1',
 });
 
 export const transactionAPI = {
-  getTransactions: (params: { limit?: number; offset?: number; start_date?: string; end_date?: string } = {}) =>
-    apiClient.get<Transaction[]>('/transactions', { params }).then(r => r.data),
+  getTransactions: (params: { limit?: number; offset?: number; start_date?: string; end_date?: string; search?: string } = {}) =>
+    apiClient.get<PaginatedTransactions>('/transactions', { params }).then(r => r.data),
 
   uploadCSV: (file: File) => {
     const formData = new FormData();
@@ -39,6 +39,20 @@ export const tagRuleAPI = {
     apiClient.delete(`/tag-rules/${id}`),
 };
 
+export const budgetAPI = {
+  list: () =>
+    apiClient.get<Budget[]>('/budgets/').then(r => r.data),
+
+  create: (category: string, limit_amount: number, period = 'monthly') =>
+    apiClient.post<Budget>('/budgets/', { category, limit_amount, period }).then(r => r.data),
+
+  update: (id: string, fields: { category?: string; limit_amount?: number; period?: string }) =>
+    apiClient.put<Budget>(`/budgets/${id}`, fields).then(r => r.data),
+
+  remove: (id: string) =>
+    apiClient.delete(`/budgets/${id}`),
+};
+
 export const analyticsAPI = {
   getSummary: (params: { start_date?: string; end_date?: string } = {}) =>
     apiClient.get<AnalyticsSummary>('/analytics/summary', { params }).then(r => r.data),
@@ -49,6 +63,6 @@ export const analyticsAPI = {
   getDailyTrend: (start_date: string, end_date: string) =>
     apiClient.get<DailyTrend[]>('/analytics/daily-trend', { params: { start_date, end_date } }).then(r => r.data),
 
-  getCategories: (params: { start_date?: string; end_date?: string } = {}) =>
+  getCategories: (params: { start_date?: string; end_date?: string; type?: string } = {}) =>
     apiClient.get<CategoryBreakdown[]>('/analytics/categories', { params }).then(r => r.data),
 };

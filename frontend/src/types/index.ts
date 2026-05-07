@@ -26,6 +26,12 @@ export interface CategoryBreakdown {
   category: string | null;
   total: number;
   count: number;
+  transaction_type?: string;
+}
+
+export interface PaginatedTransactions {
+  items: Transaction[];
+  total: number;
 }
 
 export interface UploadResult {
@@ -47,6 +53,14 @@ export interface StagedTransaction {
   confidence_score: number;
   status: StagedStatus;
   source_file: string | null;
+}
+
+export interface Budget {
+  id: string;
+  category: string;
+  limit_amount: number;
+  period: string;
+  created_at: string;
 }
 
 export interface TagRule {

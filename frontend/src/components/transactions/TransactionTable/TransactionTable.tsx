@@ -57,7 +57,7 @@ export default function TransactionTable({ transactions, isLoading, onDelete }: 
                 {onDelete && (
                   <button
                     className={styles.deleteBtn}
-                    onClick={() => onDelete(tx.id)}
+                    onClick={() => { if (window.confirm(`Delete "${tx.description}"?`)) onDelete(tx.id); }}
                     title="Delete transaction"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

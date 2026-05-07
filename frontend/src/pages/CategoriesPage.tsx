@@ -35,7 +35,7 @@ export default function CategoriesPage() {
   const [period, setPeriod] = useState<Period>('Month');
   const { start, end } = periodDates(period);
 
-  const { data: categories = [], isLoading: catLoading } = useCategoryBreakdown(start, end);
+  const { data: categories = [], isLoading: catLoading } = useCategoryBreakdown(start, end, 'expense');
   const { data: rules = [], isLoading: rulesLoading } = useTagRules();
   const createRule = useCreateTagRule();
   const deleteRule = useDeleteTagRule();

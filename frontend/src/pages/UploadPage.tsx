@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useUploadCSV, useStagedTransactions, useApproveStaged, useRejectStaged } from '../hooks/useTransactions';
 import type { UploadResult } from '../types';
 import DropZone from '../components/transactions/DropZone/DropZone';
@@ -10,8 +10,20 @@ interface UploadRecord {
   result: UploadResult;
 }
 
+const HISTORY_KEY = 'upload-history';
+const MAX_HISTORY = 20;
+
 export default function UploadPage() {
-  const [history, setHistory] = useState<UploadRecord[]>([]);
+  const [history, setHistory] = useState<UploadRecord[]>(() => {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      return raw ? (JSON.parse(raw) as UploadRecord[]) : [];
+    } catch { return []; }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+  }, [history]);
 
   const uploadMutation = useUploadCSV();
   const { data: staged = [] } = useStagedTransactions();
@@ -21,7 +33,7 @@ export default function UploadPage() {
   function handleFile(file: File) {
     uploadMutation.mutate(file, {
       onSuccess: (result) => {
-        setHistory(prev => [{ filename: file.name, result }, ...prev]);
+        setHistory(prev => [{ filename: file.name, result }, ...prev].slice(0, MAX_HISTORY));
       },
     });
   }
