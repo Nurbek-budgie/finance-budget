@@ -10,7 +10,7 @@ RUN pip install poetry==2.1.0
 
 COPY pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi --without dev
+    && poetry install --no-interaction --no-ansi --only main
 
 COPY . .
 
