@@ -1,3 +1,5 @@
+import uuid
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -5,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.infrastructure.database.connection import get_db
-from app.infrastructure.database.models import Base
+from app.infrastructure.database.models import Base, TagRuleORM
 from app.main import app
 
 SQLITE_URL = "sqlite:///:memory:"
@@ -21,6 +23,24 @@ def db_session():
     Base.metadata.create_all(engine)
     Session = sessionmaker(bind=engine)
     session = Session()
+
+    # Seed tag rules so test CSV rows get committed (not staged)
+    for keyword, category in [
+        ("salary", "Income"),
+        ("freelance", "Income"),
+        ("bonus", "Income"),
+        ("groceries", "Food & Dining"),
+        ("bills", "Utilities"),
+    ]:
+        session.add(TagRuleORM(
+            id=str(uuid.uuid4()),
+            keyword=keyword,
+            category=category,
+            priority=10,
+            is_active=True,
+        ))
+    session.commit()
+
     try:
         yield session
     finally:

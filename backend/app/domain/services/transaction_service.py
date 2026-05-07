@@ -65,22 +65,39 @@ class TransactionService:
         return result
 
     def get_category_breakdown(
-        self, start: Optional[date] = None, end: Optional[date] = None
+        self,
+        start: Optional[date] = None,
+        end: Optional[date] = None,
+        transaction_type: Optional[str] = None,
     ) -> List[dict]:
         if start and end:
             transactions = self.repository.get_by_date_range(start, end)
         else:
             transactions = self.repository.get_all(limit=100_000)
 
+        # Default: expense-only (legacy behaviour); "income" or "all" broaden the filter
+        if transaction_type == "income":
+            filtered = [t for t in transactions if t.is_income()]
+        elif transaction_type == "all":
+            filtered = transactions
+        else:
+            filtered = [t for t in transactions if t.is_expense()]
+
         totals: dict[Optional[str], float] = defaultdict(float)
         counts: dict[Optional[str], int] = defaultdict(int)
+        types: dict[Optional[str], str] = {}
 
-        for t in transactions:
-            if t.is_expense():
-                totals[t.category] += t.amount
-                counts[t.category] += 1
+        for t in filtered:
+            totals[t.category] += t.amount
+            counts[t.category] += 1
+            types[t.category] = t.transaction_type.value
 
         return [
-            {"category": cat, "total": round(total, 2), "count": counts[cat]}
+            {
+                "category": cat,
+                "total": round(total, 2),
+                "count": counts[cat],
+                "transaction_type": types[cat],
+            }
             for cat, total in sorted(totals.items(), key=lambda x: -x[1])
         ]

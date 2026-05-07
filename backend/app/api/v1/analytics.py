@@ -42,6 +42,7 @@ def get_daily_trend(
 def get_categories(
     start_date: Optional[date] = Query(None),
     end_date: Optional[date] = Query(None),
+    type: Optional[str] = Query(None, description="expense (default) | income | all"),
     service: TransactionService = Depends(get_service),
 ):
-    return service.get_category_breakdown(start=start_date, end=end_date)
+    return service.get_category_breakdown(start=start_date, end=end_date, transaction_type=type)

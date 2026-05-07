@@ -16,12 +16,20 @@ class TransactionRepository(ABC):
     def create_many_with_external_ids(self, transactions: List[Transaction]) -> List[Transaction]: ...
 
     @abstractmethod
-    def get_all(self, limit: int = 100, offset: int = 0) -> List[Transaction]: ...
+    def get_all(self, limit: int = 100, offset: int = 0, search: Optional[str] = None) -> List[Transaction]: ...
 
     @abstractmethod
     def get_by_date_range(
-        self, start: date, end: date, limit: int = 100_000
+        self, start: date, end: date, limit: int = 100_000, search: Optional[str] = None
     ) -> List[Transaction]: ...
+
+    @abstractmethod
+    def count(
+        self,
+        start: Optional[date] = None,
+        end: Optional[date] = None,
+        search: Optional[str] = None,
+    ) -> int: ...
 
     @abstractmethod
     def get_by_id(self, transaction_id: str) -> Optional[Transaction]: ...

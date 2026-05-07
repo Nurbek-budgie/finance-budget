@@ -1,5 +1,5 @@
 """Unit tests for TransactionService — no database involved."""
-from datetime import datetime
+from datetime import date, datetime
 from typing import List, Optional
 
 import pytest
@@ -23,8 +23,24 @@ class InMemoryTransactionRepository(TransactionRepository):
         self._store.extend(transactions)
         return transactions
 
-    def get_all(self, limit: int = 100, offset: int = 0) -> List[Transaction]:
-        return self._store[offset : offset + limit]
+    def create_many_with_external_ids(self, transactions: List[Transaction]) -> List[Transaction]:
+        self._store.extend(transactions)
+        return transactions
+
+    def get_all(self, limit: int = 100, offset: int = 0, search: Optional[str] = None) -> List[Transaction]:
+        items = self._store
+        if search:
+            items = [t for t in items if search.lower() in t.description.lower()]
+        return items[offset : offset + limit]
+
+    def get_by_date_range(self, start: date, end: date, limit: int = 100_000, search: Optional[str] = None) -> List[Transaction]:
+        items = [
+            t for t in self._store
+            if start <= t.date.date() <= end
+        ]
+        if search:
+            items = [t for t in items if search.lower() in t.description.lower()]
+        return items[:limit]
 
     def get_by_id(self, transaction_id: str) -> Optional[Transaction]:
         return next((t for t in self._store if t.id == transaction_id), None)
@@ -33,6 +49,17 @@ class InMemoryTransactionRepository(TransactionRepository):
         before = len(self._store)
         self._store = [t for t in self._store if t.id != transaction_id]
         return len(self._store) < before
+
+    def exists_by_external_id(self, external_id: str) -> bool:
+        return False
+
+    def count(self, start: Optional[date] = None, end: Optional[date] = None, search: Optional[str] = None) -> int:
+        items = self._store
+        if start and end:
+            items = [t for t in items if start <= t.date.date() <= end]
+        if search:
+            items = [t for t in items if search.lower() in t.description.lower()]
+        return len(items)
 
 
 def make_transaction(amount: float, type_: TransactionType, id_: str = "1") -> Transaction:

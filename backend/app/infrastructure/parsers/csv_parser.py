@@ -27,7 +27,7 @@ class CSVParser:
 
                 results.append(
                     RawTransaction(
-                        external_id="",
+                        external_id=None,
                         date_str=row["date"].strip(),
                         sender="",
                         description=row.get("description", "").strip(),

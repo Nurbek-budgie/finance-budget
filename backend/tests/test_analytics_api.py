@@ -54,7 +54,7 @@ class TestSummary:
 
     def test_summary_updates_after_delete(self, client):
         upload(client)
-        transactions = client.get("/api/v1/transactions/").json()
+        transactions = client.get("/api/v1/transactions/").json()["items"]
         income_id = next(t["id"] for t in transactions if t["transaction_type"] == "income")
         income_amount = next(t["amount"] for t in transactions if t["id"] == income_id)
 

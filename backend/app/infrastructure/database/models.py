@@ -35,6 +35,16 @@ class TagRuleORM(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+class BudgetORM(Base):
+    __tablename__ = "budgets"
+
+    id = Column(String, primary_key=True, index=True)
+    category = Column(String, nullable=False)
+    limit_amount = Column(Float, nullable=False)
+    period = Column(String, nullable=False, default="monthly")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
 class StagedTransactionORM(Base):
     __tablename__ = "staged_transactions"
 

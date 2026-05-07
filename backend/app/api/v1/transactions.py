@@ -42,6 +42,11 @@ class StagedTransactionResponse(BaseModel):
     source_file: Optional[str] = None
 
 
+class PaginatedTransactions(BaseModel):
+    items: List[TransactionResponse]
+    total: int
+
+
 class ApproveRequest(BaseModel):
     ids: Optional[List[str]] = None
     approve_all: bool = False
@@ -105,12 +110,11 @@ def upload_file(
     db: Session = Depends(get_db),
 ):
     filename = file.filename or ""
+    content = file.file.read()
     try:
-        parser = get_parser(filename)
+        parser = get_parser(filename, content)
     except UnsupportedFormatError as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-    content = file.file.read()
 
     svc = IngestionService(
         parser=parser,
@@ -169,19 +173,22 @@ def reject_staged(
     return {"rejected": count}
 
 
-@router.get("/", response_model=List[TransactionResponse])
+@router.get("/", response_model=PaginatedTransactions)
 def list_transactions(
     limit: int = 50,
     offset: int = 0,
     start_date: Optional[date] = Query(None),
     end_date: Optional[date] = Query(None),
+    search: Optional[str] = Query(None),
     service: TransactionService = Depends(get_service),
 ):
+    repo = service.repository
     if start_date and end_date:
-        transactions = service.repository.get_by_date_range(start_date, end_date, limit=limit)
+        transactions = repo.get_by_date_range(start_date, end_date, limit=limit, search=search)
     else:
-        transactions = service.repository.get_all(limit=limit, offset=offset)
-    return [_to_response(t) for t in transactions]
+        transactions = repo.get_all(limit=limit, offset=offset, search=search)
+    total = repo.count(start=start_date, end=end_date, search=search)
+    return PaginatedTransactions(items=[_to_response(t) for t in transactions], total=total)
 
 
 @router.delete("/{transaction_id}")

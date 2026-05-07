@@ -49,29 +49,41 @@ class TransactionRepositoryImpl(TransactionRepository):
         self.db.commit()
         return [_to_domain(o) for o in orm_objects]
 
-    def get_all(self, limit: int = 100, offset: int = 0) -> List[Transaction]:
-        rows = (
-            self.db.query(TransactionORM)
-            .order_by(TransactionORM.date.desc())
-            .limit(limit)
-            .offset(offset)
-            .all()
-        )
+    def get_all(self, limit: int = 100, offset: int = 0, search: Optional[str] = None) -> List[Transaction]:
+        q = self.db.query(TransactionORM)
+        if search:
+            q = q.filter(TransactionORM.description.ilike(f"%{search}%"))
+        rows = q.order_by(TransactionORM.date.desc()).limit(limit).offset(offset).all()
         return [_to_domain(r) for r in rows]
 
     def get_by_date_range(
-        self, start: date, end: date, limit: int = 100_000
+        self, start: date, end: date, limit: int = 100_000, search: Optional[str] = None
     ) -> List[Transaction]:
         start_dt = datetime.combine(start, datetime.min.time())
         end_dt = datetime.combine(end, datetime.max.time())
-        rows = (
+        q = (
             self.db.query(TransactionORM)
             .filter(TransactionORM.date >= start_dt, TransactionORM.date <= end_dt)
-            .order_by(TransactionORM.date.desc())
-            .limit(limit)
-            .all()
         )
+        if search:
+            q = q.filter(TransactionORM.description.ilike(f"%{search}%"))
+        rows = q.order_by(TransactionORM.date.desc()).limit(limit).all()
         return [_to_domain(r) for r in rows]
+
+    def count(
+        self,
+        start: Optional[date] = None,
+        end: Optional[date] = None,
+        search: Optional[str] = None,
+    ) -> int:
+        q = self.db.query(TransactionORM)
+        if start and end:
+            start_dt = datetime.combine(start, datetime.min.time())
+            end_dt = datetime.combine(end, datetime.max.time())
+            q = q.filter(TransactionORM.date >= start_dt, TransactionORM.date <= end_dt)
+        if search:
+            q = q.filter(TransactionORM.description.ilike(f"%{search}%"))
+        return q.count()
 
     def get_by_id(self, transaction_id: str) -> Optional[Transaction]:
         row = self.db.query(TransactionORM).filter(TransactionORM.id == transaction_id).first()
