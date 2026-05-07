@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.api.v1 import router as api_v1_router
+from app.config import settings
 
 app = FastAPI(
     title="Finance Tracker API",
@@ -18,7 +19,7 @@ app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=settings.ALLOWED_ORIGINS.split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
