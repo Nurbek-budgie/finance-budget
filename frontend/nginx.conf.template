@@ -4,14 +4,16 @@ server {
     root /usr/share/nginx/html;
     index index.html;
 
-    # serve React app — fall back to index.html for client-side routing
+    # defer upstream DNS to request time so nginx starts even if backend is down
+    resolver 127.0.0.11 valid=30s ipv6=off;
+
     location / {
         try_files $uri $uri/ /index.html;
     }
 
-    # proxy API calls to the backend service
     location /api/ {
-        proxy_pass http://backend:8000;
+        set $upstream http://${BACKEND_HOST}:${BACKEND_PORT};
+        proxy_pass $upstream;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }
