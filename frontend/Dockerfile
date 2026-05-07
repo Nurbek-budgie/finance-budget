@@ -6,6 +6,9 @@ COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
+
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
 RUN npm run build
 
 FROM nginx:alpine AS runner
@@ -15,4 +18,4 @@ COPY nginx.conf.template /etc/nginx/conf.d/default.conf.template
 
 EXPOSE 80
 
-CMD ["/bin/sh", "-c", "export RESOLVER=$(grep nameserver /etc/resolv.conf | head -1 | awk '{print $2}') && envsubst '${PORT} ${RESOLVER} ${BACKEND_HOST} ${BACKEND_PORT}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+CMD ["/bin/sh", "-c", "envsubst '${PORT}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
