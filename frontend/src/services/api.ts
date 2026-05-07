@@ -2,7 +2,7 @@ import axios from 'axios';
 import type { PaginatedTransactions, AnalyticsSummary, DailyTrend, CategoryBreakdown, UploadResult, StagedTransaction, TagRule, Budget } from '../types';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000/api/v1',
+  baseURL: import.meta.env.VITE_API_URL ?? '/api/v1',
 });
 
 export const transactionAPI = {
