@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { Transaction, PaginatedTransactions, AnalyticsSummary, DailyTrend, CategoryBreakdown, UploadResult, StagedTransaction, TagRule, Budget } from '../types';
+import type { PaginatedTransactions, AnalyticsSummary, DailyTrend, CategoryBreakdown, UploadResult, StagedTransaction, TagRule, Budget } from '../types';
 
 const apiClient = axios.create({
   baseURL: 'http://localhost:8000/api/v1',

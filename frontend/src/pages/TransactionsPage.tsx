@@ -33,7 +33,7 @@ function periodDates(period: Period): { start: string; end: string } {
 
 export default function TransactionsPage() {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [period, setPeriod] = useState<Period>('Month');
   const [page, setPage] = useState(0);
 
@@ -63,10 +63,6 @@ export default function TransactionsPage() {
   function handlePeriodChange(p: Period) {
     setPeriod(p);
     setPage(0);
-  }
-
-  function handleSearch(value: string) {
-    setSearchParams(value ? { q: value } : {}, { replace: true });
   }
 
   return (

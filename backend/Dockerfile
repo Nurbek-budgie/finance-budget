@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpq-dev gcc \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install poetry==1.8.3
+RUN pip install poetry==2.1.0
 
 COPY pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.create false \
