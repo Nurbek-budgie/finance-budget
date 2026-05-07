@@ -9,12 +9,14 @@ interface KpiCardProps {
 }
 
 function Sparkline({ data, up }: { data: number[]; up: boolean }) {
-  const max = Math.max(...data);
-  const min = Math.min(...data);
+  const safe = Array.isArray(data) && data.length > 0 ? data : [0];
+  const pts_data = safe.length === 1 ? [safe[0], safe[0]] : safe;
+  const max = Math.max(...pts_data);
+  const min = Math.min(...pts_data);
   const range = max - min || 1;
   const W = 80, H = 28;
-  const pts = data
-    .map((v, i) => `${(i / (data.length - 1)) * W},${H - ((v - min) / range) * (H - 6) - 3}`)
+  const pts = pts_data
+    .map((v, i) => `${(i / (pts_data.length - 1)) * W},${H - ((v - min) / range) * (H - 6) - 3}`)
     .join(' ');
   return (
     <svg width={W} height={H} style={{ overflow: 'visible' }}>

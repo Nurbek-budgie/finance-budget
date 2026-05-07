@@ -57,8 +57,9 @@ function DonutChart({ categories, total }: DonutProps) {
 }
 
 export default function TopCategories({ categories, isLoading }: TopCategoriesProps) {
-  const total = categories.reduce((s, c) => s + c.total, 0);
-  const top = categories.slice(0, 7);
+  const safe = Array.isArray(categories) ? categories : [];
+  const total = safe.reduce((s, c) => s + c.total, 0);
+  const top = safe.slice(0, 7);
 
   return (
     <div className={styles.card}>
